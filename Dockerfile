@@ -4,5 +4,5 @@ RUN mkdir uploads
 
 ADD target/*.jar app.jar
 
-EXPOSE 8762
+EXPOSE 8072
 ENTRYPOINT ["java", "-jar", "/app.jar"]
