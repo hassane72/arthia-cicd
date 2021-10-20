@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +40,19 @@ public class FilesRessource {
     @PostMapping
     public ResponseEntity<UploadResponseMessage> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
-            fileService.save(file);
+            String[] exts = file.getOriginalFilename().split(Pattern.quote("."));
+            String ext = exts[exts.length - 1];
+            if(ext.equals("mp3") || ext.equals("mp4")){
+
+                fileService.saveAndConvertM3u8(file);
+            }else{
+                fileService.save(file);
+            }
 
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new UploadResponseMessage("Uploaded the file successfully: " + file.getOriginalFilename()));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED)
                     .body(new UploadResponseMessage("Could not upload the file: " + file.getOriginalFilename() + "!"));
         }
